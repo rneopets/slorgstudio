@@ -11,11 +11,12 @@ export const DEFAULT_EXPORT_SIZE_PX = 2048
 // around 16384px per side; staying well under that avoids silent clamping/blank canvases).
 const MAX_WORKING_SIZE_PX = 8192
 
-export async function exportSlorgPng(
+/** Renders a Slorg to a trimmed PNG blob at the given target size. Shared by the download and copy-to-clipboard export paths. */
+export async function renderSlorgPngBlob(
   image: HTMLImageElement | null,
   transform: ImageTransform,
   options: SlorgAppearance & { sizePx: number },
-): Promise<void> {
+): Promise<Blob> {
   const renderOptionsFor = (size: number): RenderOptions => ({
     canvasWidth: size,
     canvasHeight: size,
@@ -63,6 +64,23 @@ export async function exportSlorgPng(
 
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"))
   if (!blob) throw new Error("Failed to encode PNG")
+  return blob
+}
 
+export async function exportSlorgPng(
+  image: HTMLImageElement | null,
+  transform: ImageTransform,
+  options: SlorgAppearance & { sizePx: number },
+): Promise<void> {
+  const blob = await renderSlorgPngBlob(image, transform, options)
   downloadBlob(blob, "slorg.png")
+}
+
+export async function copySlorgPngToClipboard(
+  image: HTMLImageElement | null,
+  transform: ImageTransform,
+  options: SlorgAppearance & { sizePx: number },
+): Promise<void> {
+  const blob = await renderSlorgPngBlob(image, transform, options)
+  await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })])
 }
