@@ -48,8 +48,11 @@ export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTr
   let backgroundMarkup = ""
   if (image) {
     const rect = computeCoverRect(image.naturalWidth, image.naturalHeight, BODY_BBOX, transform)
+    const cx = rect.x + rect.width / 2
+    const cy = rect.y + rect.height / 2
     const href = imageToDataUrl(image)
-    backgroundMarkup = `<image href="${href}" x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" preserveAspectRatio="none"/>`
+    const rotateAttr = transform.rotation ? ` transform="rotate(${transform.rotation} ${cx} ${cy})"` : ""
+    backgroundMarkup = `<image href="${href}" x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" preserveAspectRatio="none"${rotateAttr}/>`
   } else if (backgroundColor) {
     // Overfill past the body's true bounds and let the clip trim it to the silhouette, rather
     // than relying on BODY_BBOX being pixel-exact - guarantees no gap between the fill and the

@@ -11,9 +11,11 @@ export interface ImageTransform {
   /** Pan offset in viewBox units, relative to the bbox center. */
   offsetX: number
   offsetY: number
+  /** Rotation in degrees, applied around the drawn image's own center. Range -180..180, 0 = none. */
+  rotation: number
 }
 
-export const DEFAULT_TRANSFORM: ImageTransform = { userScale: 1, offsetX: 0, offsetY: 0 }
+export const DEFAULT_TRANSFORM: ImageTransform = { userScale: 1, offsetX: 0, offsetY: 0, rotation: 0 }
 
 /** The "background-size: cover" base scale that makes an image of naturalW x naturalH fully cover bbox. */
 export function baseCoverScale(naturalWidth: number, naturalHeight: number, bbox: Rect): number {

@@ -2,6 +2,7 @@ import { Stack, Tabs } from "@chakra-ui/react"
 import { Section } from "../../components/ui/Section"
 import { ImageDropzone } from "../../components/ui/ImageDropzone"
 import { ZoomSlider } from "../../components/ui/ZoomSlider"
+import { RotationSlider } from "../../components/ui/RotationSlider"
 import { ColorSwatchInput } from "../../components/ui/ColorSwatchInput"
 import { DEFAULT_BODY_COLOR } from "../../art/slorgArt"
 import type { ImageTransform } from "../../art/coverFit"
@@ -41,6 +42,11 @@ export function BackgroundSection({
             <ZoomSlider
               value={transform.userScale}
               onChange={(userScale) => onTransformChange({ ...transform, userScale })}
+              disabled={!hasImage}
+            />
+            <RotationSlider
+              value={transform.rotation}
+              onChange={(rotation) => onTransformChange({ ...transform, rotation })}
               disabled={!hasImage}
             />
           </Stack>
