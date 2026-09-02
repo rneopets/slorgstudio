@@ -125,7 +125,14 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
   ctx.clip(bodyClip)
   if (image) {
     const rect = computeCoverRect(image.naturalWidth, image.naturalHeight, BODY_BBOX, imageTransform)
+    const cx = rect.x + rect.width / 2
+    const cy = rect.y + rect.height / 2
+    ctx.save()
+    ctx.translate(cx, cy)
+    ctx.rotate((imageTransform.rotation * Math.PI) / 180)
+    ctx.translate(-cx, -cy)
     ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height)
+    ctx.restore()
   } else if (backgroundColor) {
     // Overfill past the body's true bounds and let the clip trim it to the silhouette, rather
     // than relying on BODY_BBOX being pixel-exact - guarantees no gap between the fill and the
