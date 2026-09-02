@@ -1,6 +1,7 @@
 import type { TextProps } from "@chakra-ui/react"
-import { Box, Container, Heading, HStack, Icon, Link, Stack, Text } from "@chakra-ui/react"
+import { Box, Center, Container, Heading, HStack, Icon, Link, Stack, Text } from "@chakra-ui/react"
 import { FaDiscord, FaGithub } from "react-icons/fa6"
+import { GitCommit } from "../ui/GitCommit"
 import { FooterLogo } from "./FooterLogo"
 
 const socialLinks = [
@@ -45,6 +46,9 @@ export function Footer() {
             </HStack>
           </Stack>
           <Copyright />
+          <Center>
+            <GitCommit />
+          </Center>
         </Stack>
       </Container>
     </Box>
