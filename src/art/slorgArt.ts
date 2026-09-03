@@ -29,7 +29,7 @@ export const PADDING = 16
 export const PADDED_VIEWBOX = { width: VIEWBOX.width + PADDING * 2, height: VIEWBOX.height + PADDING * 2 }
 
 /** Bounding box of the body silhouette (BODY_OUTLINE), in viewBox units. Used as the cover-fit crop target. */
-export const BODY_BBOX = { x: 10.404, y: 21.408, width: 154.36, height: 142.256 }
+export const BODY_BBOX = { x: 7.647, y: 18.708, width: 159.978, height: 147.729 }
 
 /** Closed path tracing the full body silhouette. Used both as the clip region for the user's photo and redrawn as the outline stroke on top. */
 export const BODY_OUTLINE: SlorgPath = {
