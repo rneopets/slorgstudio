@@ -23,6 +23,8 @@ export async function renderSlorgPngBlob(
     image,
     imageTransform: transform,
     backgroundColor: options.backgroundColor,
+    colorOpacity: options.colorOpacity,
+    colorLayer: options.colorLayer,
     madEyes: options.madEyes,
     spots: options.spots,
     spotColor: options.spotColor,

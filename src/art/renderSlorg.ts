@@ -108,6 +108,8 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
     image,
     imageTransform = DEFAULT_TRANSFORM,
     backgroundColor = null,
+    colorOpacity = 1,
+    colorLayer = "back",
     madEyes = false,
     spots = true,
     spotColor = SPOT_COLOR,
@@ -123,9 +125,8 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
 
   const bodyClip = pathWithTransform(BODY_OUTLINE)
 
-  ctx.save()
-  ctx.clip(bodyClip)
-  if (image) {
+  function paintImage() {
+    if (!image) return
     const rect = computeCoverRect(image.naturalWidth, image.naturalHeight, BODY_BBOX, imageTransform)
     const cx = rect.x + rect.width / 2
     const cy = rect.y + rect.height / 2
@@ -135,17 +136,34 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
     ctx.scale(imageTransform.flipHorizontal ? -1 : 1, imageTransform.flipVertical ? -1 : 1)
     ctx.translate(-cx, -cy)
     ctx.filter = imageTransform.blur > 0 ? `blur(${imageTransform.blur * viewboxToCanvasScale}px)` : "none"
+    ctx.globalAlpha = imageTransform.opacity
     ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height)
     ctx.restore()
-  } else if (backgroundColor) {
+  }
+
+  function paintColor() {
+    if (!backgroundColor) return
     // Overfill past the body's true bounds and let the clip trim it to the silhouette, rather
     // than relying on BODY_BBOX being pixel-exact - guarantees no gap between the fill and the
     // outline on any side.
+    ctx.save()
+    ctx.globalAlpha = colorOpacity
     ctx.fillStyle = backgroundColor
     ctx.fillRect(-PADDING, -PADDING, PADDED_VIEWBOX.width, PADDED_VIEWBOX.height)
-  } else {
+    ctx.restore()
+  }
+
+  ctx.save()
+  ctx.clip(bodyClip)
+  if (!image && !backgroundColor) {
     ctx.fillStyle = getCheckerPattern(ctx)
     ctx.fillRect(-PADDING, -PADDING, PADDED_VIEWBOX.width, PADDED_VIEWBOX.height)
+  } else if (colorLayer === "front") {
+    paintImage()
+    paintColor()
+  } else {
+    paintColor()
+    paintImage()
   }
   if (spots) drawSpotsOverlay(ctx, canvasWidth, canvasHeight, spotColor, spotOpacity)
   ctx.restore()

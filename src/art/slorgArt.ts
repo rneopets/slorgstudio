@@ -12,6 +12,8 @@ export interface SlorgPath {
 /** The set of user-configurable visual toggles that affect how a Slorg is drawn, shared by the canvas renderer, the SVG exporter, and their callers. */
 export interface SlorgAppearance {
   backgroundColor: string | null
+  colorOpacity: number
+  colorLayer: "front" | "back"
   madEyes: boolean
   spots: boolean
   spotColor: string

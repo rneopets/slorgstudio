@@ -19,6 +19,8 @@ export interface ImageTransform {
   flipVertical: boolean
   /** Gaussian blur radius in viewBox units applied to the image only. Range 0..20, 0 = none. */
   blur: number
+  /** Opacity of the image layer. Range 0..1, 1 = fully opaque. */
+  opacity: number
 }
 
 export const DEFAULT_TRANSFORM: ImageTransform = {
@@ -29,6 +31,7 @@ export const DEFAULT_TRANSFORM: ImageTransform = {
   flipHorizontal: false,
   flipVertical: false,
   blur: 0,
+  opacity: 1,
 }
 
 /** The "background-size: cover" base scale that makes an image of naturalW x naturalH fully cover bbox. */

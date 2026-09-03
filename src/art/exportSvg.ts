@@ -40,12 +40,12 @@ function imageToDataUrl(image: HTMLImageElement): string {
 }
 
 export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTransform, options: SlorgAppearance): string {
-  const { backgroundColor, madEyes, spots, spotColor, spotOpacity } = options
+  const { backgroundColor, colorOpacity, colorLayer, madEyes, spots, spotColor, spotOpacity } = options
   const [oa, ob, oc, od, oe, of] = BODY_OUTLINE.transform
   const outlineStroke = BODY_OUTLINE.stroke ?? "#000000"
   const outlineWidth = BODY_OUTLINE.strokeWidth ?? 1
 
-  let backgroundMarkup = ""
+  let imageMarkup = ""
   if (image) {
     const rect = computeCoverRect(image.naturalWidth, image.naturalHeight, BODY_BBOX, transform)
     const cx = rect.x + rect.width / 2
@@ -62,13 +62,20 @@ export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTr
     }
     const transformAttr = transformParts.length ? ` transform="${transformParts.join(" ")}"` : ""
     const filterAttr = transform.blur > 0 ? ` filter="url(#slorg-blur)"` : ""
-    backgroundMarkup = `<image href="${href}" x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" preserveAspectRatio="none"${transformAttr}${filterAttr}/>`
-  } else if (backgroundColor) {
+    const opacityAttr = transform.opacity < 1 ? ` opacity="${transform.opacity}"` : ""
+    imageMarkup = `<image href="${href}" x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" preserveAspectRatio="none"${transformAttr}${filterAttr}${opacityAttr}/>`
+  }
+
+  let colorMarkup = ""
+  if (backgroundColor) {
     // Overfill past the body's true bounds and let the clip trim it to the silhouette, rather
     // than relying on BODY_BBOX being pixel-exact - guarantees no gap between the fill and the
     // outline on any side.
-    backgroundMarkup = `<rect x="${-PADDING}" y="${-PADDING}" width="${PADDED_VIEWBOX.width}" height="${PADDED_VIEWBOX.height}" fill="${backgroundColor}"/>`
+    const opacityAttr = colorOpacity < 1 ? ` opacity="${colorOpacity}"` : ""
+    colorMarkup = `<rect x="${-PADDING}" y="${-PADDING}" width="${PADDED_VIEWBOX.width}" height="${PADDED_VIEWBOX.height}" fill="${backgroundColor}"${opacityAttr}/>`
   }
+
+  const backgroundMarkup = colorLayer === "front" ? `${imageMarkup}${colorMarkup}` : `${colorMarkup}${imageMarkup}`
 
   // Group opacity (not per-path fill-opacity) composites the whole layer once, so overlapping
   // spots don't stack alpha - mirrors the offscreen-mask technique used by the canvas renderer.
