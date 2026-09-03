@@ -6,15 +6,17 @@ import { RotationSlider } from "../../components/ui/RotationSlider"
 import { FlipButtons } from "../../components/ui/FlipButtons"
 import { BlurSlider } from "../../components/ui/BlurSlider"
 import { OpacitySlider } from "../../components/ui/OpacitySlider"
-import { ColorSwatchInput } from "../../components/ui/ColorSwatchInput"
+import { ColorListInput } from "../../components/ui/ColorListInput"
+import { GradientAngleSlider } from "../../components/ui/GradientAngleSlider"
 import { ColorLayerToggle } from "../../components/ui/ColorLayerToggle"
-import { DEFAULT_BODY_COLOR } from "../../art/slorgArt"
 import type { ImageTransform } from "../../art/coverFit"
 
 interface BackgroundSectionProps {
   onImageReady: (image: HTMLImageElement) => void
-  backgroundColor: string | null
-  onBackgroundColorChange: (color: string) => void
+  backgroundColors: string[]
+  onBackgroundColorsChange: (colors: string[]) => void
+  colorGradientAngle: number
+  onColorGradientAngleChange: (angle: number) => void
   colorOpacity: number
   onColorOpacityChange: (value: number) => void
   colorLayer: "front" | "back"
@@ -26,8 +28,10 @@ interface BackgroundSectionProps {
 
 export function BackgroundSection({
   onImageReady,
-  backgroundColor,
-  onBackgroundColorChange,
+  backgroundColors,
+  onBackgroundColorsChange,
+  colorGradientAngle,
+  onColorGradientAngleChange,
   colorOpacity,
   onColorOpacityChange,
   colorLayer,
@@ -42,7 +46,12 @@ export function BackgroundSection({
         <Text fontWeight="medium" fontSize="sm">
           Color
         </Text>
-        <ColorSwatchInput value={backgroundColor ?? DEFAULT_BODY_COLOR} onChange={onBackgroundColorChange} />
+        <ColorListInput colors={backgroundColors} onChange={onBackgroundColorsChange} />
+        <GradientAngleSlider
+          value={colorGradientAngle}
+          onChange={onColorGradientAngleChange}
+          disabled={backgroundColors.length <= 1}
+        />
         <OpacitySlider label="Color opacity" value={colorOpacity} onChange={onColorOpacityChange} />
         <ColorLayerToggle value={colorLayer} onChange={onColorLayerChange} disabled={!hasImage} />
 

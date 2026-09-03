@@ -1,6 +1,7 @@
 import {
   BODY_BBOX,
   BODY_OUTLINE,
+  DEFAULT_GRADIENT_ANGLE,
   EYE_PATHS,
   HIGHLIGHT_PATH_IDS,
   MAD_EYEBROW_PATHS,
@@ -18,6 +19,7 @@ import {
   type SlorgPath,
 } from "./slorgArt"
 import { computeCoverRect, DEFAULT_TRANSFORM, type ImageTransform } from "./coverFit"
+import { computeGradientLine, gradientStopOffsets } from "./gradient"
 
 function pathWithTransform(spec: SlorgPath): Path2D {
   const [a, b, c, d, e, f] = spec.transform
@@ -107,7 +109,8 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
     canvasHeight,
     image,
     imageTransform = DEFAULT_TRANSFORM,
-    backgroundColor = null,
+    backgroundColors = [],
+    colorGradientAngle = DEFAULT_GRADIENT_ANGLE,
     colorOpacity = 1,
     colorLayer = "back",
     madEyes = false,
@@ -142,20 +145,24 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
   }
 
   function paintColor() {
-    if (!backgroundColor) return
+    if (backgroundColors.length === 0) return
     // Overfill past the body's true bounds and let the clip trim it to the silhouette, rather
     // than relying on BODY_BBOX being pixel-exact - guarantees no gap between the fill and the
     // outline on any side.
     ctx.save()
     ctx.globalAlpha = colorOpacity
-    ctx.fillStyle = backgroundColor
+    const line = computeGradientLine(-PADDING, -PADDING, PADDED_VIEWBOX.width, PADDED_VIEWBOX.height, colorGradientAngle)
+    const gradient = ctx.createLinearGradient(line.x1, line.y1, line.x2, line.y2)
+    const offsets = gradientStopOffsets(backgroundColors.length)
+    backgroundColors.forEach((color, i) => gradient.addColorStop(offsets[i], color))
+    ctx.fillStyle = gradient
     ctx.fillRect(-PADDING, -PADDING, PADDED_VIEWBOX.width, PADDED_VIEWBOX.height)
     ctx.restore()
   }
 
   ctx.save()
   ctx.clip(bodyClip)
-  if (!image && !backgroundColor) {
+  if (!image && backgroundColors.length === 0) {
     ctx.fillStyle = getCheckerPattern(ctx)
     ctx.fillRect(-PADDING, -PADDING, PADDED_VIEWBOX.width, PADDED_VIEWBOX.height)
   } else if (colorLayer === "front") {

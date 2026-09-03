@@ -30,7 +30,7 @@ export function FooterLogo({ size = 64 }: FooterLogoProps) {
       canvasWidth: pixelSize,
       canvasHeight: pixelSize,
       image: null,
-      backgroundColor: DEFAULT_BODY_COLOR,
+      backgroundColors: [DEFAULT_BODY_COLOR],
       madEyes,
       spots: true,
       spotColor: SPOT_COLOR,

@@ -16,6 +16,7 @@ import {
   type SlorgPath,
 } from "./slorgArt"
 import { computeCoverRect, type ImageTransform } from "./coverFit"
+import { computeGradientLine, gradientStopOffsets } from "./gradient"
 import { computeTrimFraction } from "./trimBounds"
 import { downloadBlob } from "../lib/downloadBlob"
 
@@ -40,7 +41,7 @@ function imageToDataUrl(image: HTMLImageElement): string {
 }
 
 export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTransform, options: SlorgAppearance): string {
-  const { backgroundColor, colorOpacity, colorLayer, madEyes, spots, spotColor, spotOpacity } = options
+  const { backgroundColors, colorGradientAngle, colorOpacity, colorLayer, madEyes, spots, spotColor, spotOpacity } = options
   const [oa, ob, oc, od, oe, of] = BODY_OUTLINE.transform
   const outlineStroke = BODY_OUTLINE.stroke ?? "#000000"
   const outlineWidth = BODY_OUTLINE.strokeWidth ?? 1
@@ -67,12 +68,19 @@ export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTr
   }
 
   let colorMarkup = ""
-  if (backgroundColor) {
+  let colorGradientDefMarkup = ""
+  if (backgroundColors.length > 0) {
     // Overfill past the body's true bounds and let the clip trim it to the silhouette, rather
     // than relying on BODY_BBOX being pixel-exact - guarantees no gap between the fill and the
     // outline on any side.
     const opacityAttr = colorOpacity < 1 ? ` opacity="${colorOpacity}"` : ""
-    colorMarkup = `<rect x="${-PADDING}" y="${-PADDING}" width="${PADDED_VIEWBOX.width}" height="${PADDED_VIEWBOX.height}" fill="${backgroundColor}"${opacityAttr}/>`
+    const line = computeGradientLine(-PADDING, -PADDING, PADDED_VIEWBOX.width, PADDED_VIEWBOX.height, colorGradientAngle)
+    const offsets = gradientStopOffsets(backgroundColors.length)
+    const stopsMarkup = backgroundColors
+      .map((color, i) => `<stop offset="${offsets[i]}" stop-color="${color}"/>`)
+      .join("")
+    colorGradientDefMarkup = `<linearGradient id="slorg-bg-gradient" gradientUnits="userSpaceOnUse" x1="${line.x1}" y1="${line.y1}" x2="${line.x2}" y2="${line.y2}">${stopsMarkup}</linearGradient>`
+    colorMarkup = `<rect x="${-PADDING}" y="${-PADDING}" width="${PADDED_VIEWBOX.width}" height="${PADDED_VIEWBOX.height}" fill="url(#slorg-bg-gradient)"${opacityAttr}/>`
   }
 
   const backgroundMarkup = colorLayer === "front" ? `${imageMarkup}${colorMarkup}` : `${colorMarkup}${imageMarkup}`
@@ -116,6 +124,7 @@ export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTr
 <path d="${BODY_OUTLINE.d}" transform="matrix(${oa},${ob},${oc},${od},${oe},${of})"/>
 </clipPath>
 ${blurFilterMarkup}
+${colorGradientDefMarkup}
 </defs>
 <g transform="translate(${PADDING},${PADDING})">
 <g clip-path="url(#slorg-body-clip)">

@@ -11,7 +11,8 @@ export interface SlorgPath {
 
 /** The set of user-configurable visual toggles that affect how a Slorg is drawn, shared by the canvas renderer, the SVG exporter, and their callers. */
 export interface SlorgAppearance {
-  backgroundColor: string | null
+  backgroundColors: string[]
+  colorGradientAngle: number
   colorOpacity: number
   colorLayer: "front" | "back"
   madEyes: boolean
@@ -185,6 +186,9 @@ export const SPOT_OPACITY = 1
 
 /** Default flat background color for the body. */
 export const DEFAULT_BODY_COLOR = "#a5a600"
+
+/** Default gradient angle (degrees, clockwise-positive from +x) when multiple base colors are set - 45 gives the classic top-left-to-bottom-right diagonal. */
+export const DEFAULT_GRADIENT_ANGLE = 45
 
 /**
  * Decorative spot shapes from the original rainbow body art (paths 8-18: the small

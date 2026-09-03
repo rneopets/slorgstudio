@@ -20,7 +20,7 @@ export function ExportButton({ image, transform, ...appearance }: ExportButtonPr
   const [isCopying, setIsCopying] = useState(false)
   const [justCopied, setJustCopied] = useState(false)
   const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const canExport = !!image || !!appearance.backgroundColor
+  const canExport = !!image || appearance.backgroundColors.length > 0
 
   async function handleExportPng() {
     if (!canExport) return

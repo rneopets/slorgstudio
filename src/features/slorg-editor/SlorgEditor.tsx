@@ -6,12 +6,13 @@ import { CharacterSection } from "./CharacterSection"
 import { Section } from "../../components/ui/Section"
 import { ExportButton } from "./ExportButton"
 import { DEFAULT_TRANSFORM, type ImageTransform } from "../../art/coverFit"
-import { DEFAULT_BODY_COLOR, SPOT_COLOR, SPOT_OPACITY } from "../../art/slorgArt"
+import { DEFAULT_BODY_COLOR, DEFAULT_GRADIENT_ANGLE, SPOT_COLOR, SPOT_OPACITY } from "../../art/slorgArt"
 
 export function SlorgEditor() {
   const [image, setImage] = useState<HTMLImageElement | null>(null)
   const [transform, setTransform] = useState<ImageTransform>(DEFAULT_TRANSFORM)
-  const [backgroundColor, setBackgroundColor] = useState<string | null>(DEFAULT_BODY_COLOR)
+  const [backgroundColors, setBackgroundColors] = useState<string[]>([DEFAULT_BODY_COLOR])
+  const [colorGradientAngle, setColorGradientAngle] = useState(DEFAULT_GRADIENT_ANGLE)
   const [colorOpacity, setColorOpacity] = useState(1)
   const [colorLayer, setColorLayer] = useState<"front" | "back">("back")
   const [madEyes, setMadEyes] = useState(false)
@@ -31,7 +32,8 @@ export function SlorgEditor() {
           image={image}
           transform={transform}
           onTransformChange={setTransform}
-          backgroundColor={backgroundColor}
+          backgroundColors={backgroundColors}
+          colorGradientAngle={colorGradientAngle}
           colorOpacity={colorOpacity}
           colorLayer={colorLayer}
           madEyes={madEyes}
@@ -44,7 +46,8 @@ export function SlorgEditor() {
           <ExportButton
             image={image}
             transform={transform}
-            backgroundColor={backgroundColor}
+            backgroundColors={backgroundColors}
+            colorGradientAngle={colorGradientAngle}
             colorOpacity={colorOpacity}
             colorLayer={colorLayer}
             madEyes={madEyes}
@@ -58,8 +61,10 @@ export function SlorgEditor() {
       <Stack flex="1" width="full" gap="0" borderWidth="1px" borderColor="border" borderRadius="lg" p="5">
         <BackgroundSection
           onImageReady={handleImageReady}
-          backgroundColor={backgroundColor}
-          onBackgroundColorChange={setBackgroundColor}
+          backgroundColors={backgroundColors}
+          onBackgroundColorsChange={setBackgroundColors}
+          colorGradientAngle={colorGradientAngle}
+          onColorGradientAngleChange={setColorGradientAngle}
           colorOpacity={colorOpacity}
           onColorOpacityChange={setColorOpacity}
           colorLayer={colorLayer}
