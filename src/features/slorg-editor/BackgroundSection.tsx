@@ -1,4 +1,4 @@
-import { Separator, Stack, Text } from "@chakra-ui/react"
+import { Collapsible, Separator, Stack, Text } from "@chakra-ui/react"
 import { Section } from "../../components/ui/Section"
 import { ImageDropzone } from "../../components/ui/ImageDropzone"
 import { ZoomSlider } from "../../components/ui/ZoomSlider"
@@ -47,11 +47,11 @@ export function BackgroundSection({
           Color
         </Text>
         <ColorListInput colors={backgroundColors} onChange={onBackgroundColorsChange} />
-        <GradientAngleSlider
-          value={colorGradientAngle}
-          onChange={onColorGradientAngleChange}
-          disabled={backgroundColors.length <= 1}
-        />
+        <Collapsible.Root open={backgroundColors.length > 1}>
+          <Collapsible.Content>
+            <GradientAngleSlider value={colorGradientAngle} onChange={onColorGradientAngleChange} />
+          </Collapsible.Content>
+        </Collapsible.Root>
         <OpacitySlider label="Color opacity" value={colorOpacity} onChange={onColorOpacityChange} />
         <ColorLayerToggle value={colorLayer} onChange={onColorLayerChange} disabled={!hasImage} />
 
@@ -61,34 +61,32 @@ export function BackgroundSection({
           Image
         </Text>
         <ImageDropzone onImageReady={onImageReady} />
-        <ZoomSlider
-          value={transform.userScale}
-          onChange={(userScale) => onTransformChange({ ...transform, userScale })}
-          disabled={!hasImage}
-        />
-        <RotationSlider
-          value={transform.rotation}
-          onChange={(rotation) => onTransformChange({ ...transform, rotation })}
-          disabled={!hasImage}
-        />
-        <FlipButtons
-          flipHorizontal={transform.flipHorizontal}
-          flipVertical={transform.flipVertical}
-          onFlipHorizontalChange={(flipHorizontal) => onTransformChange({ ...transform, flipHorizontal })}
-          onFlipVerticalChange={(flipVertical) => onTransformChange({ ...transform, flipVertical })}
-          disabled={!hasImage}
-        />
-        <BlurSlider
-          value={transform.blur}
-          onChange={(blur) => onTransformChange({ ...transform, blur })}
-          disabled={!hasImage}
-        />
-        <OpacitySlider
-          label="Image opacity"
-          value={transform.opacity}
-          onChange={(opacity) => onTransformChange({ ...transform, opacity })}
-          disabled={!hasImage}
-        />
+        <Collapsible.Root open={hasImage}>
+          <Collapsible.Content>
+            <Stack gap="3">
+              <ZoomSlider
+                value={transform.userScale}
+                onChange={(userScale) => onTransformChange({ ...transform, userScale })}
+              />
+              <RotationSlider
+                value={transform.rotation}
+                onChange={(rotation) => onTransformChange({ ...transform, rotation })}
+              />
+              <FlipButtons
+                flipHorizontal={transform.flipHorizontal}
+                flipVertical={transform.flipVertical}
+                onFlipHorizontalChange={(flipHorizontal) => onTransformChange({ ...transform, flipHorizontal })}
+                onFlipVerticalChange={(flipVertical) => onTransformChange({ ...transform, flipVertical })}
+              />
+              <BlurSlider value={transform.blur} onChange={(blur) => onTransformChange({ ...transform, blur })} />
+              <OpacitySlider
+                label="Image opacity"
+                value={transform.opacity}
+                onChange={(opacity) => onTransformChange({ ...transform, opacity })}
+              />
+            </Stack>
+          </Collapsible.Content>
+        </Collapsible.Root>
       </Stack>
     </Section>
   )

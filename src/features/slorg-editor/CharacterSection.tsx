@@ -1,4 +1,4 @@
-import { HStack, Switch } from "@chakra-ui/react"
+import { Collapsible, HStack, Switch } from "@chakra-ui/react"
 import { Section } from "../../components/ui/Section"
 import { OpacitySlider } from "../../components/ui/OpacitySlider"
 import { ColorSwatchInput } from "../../components/ui/ColorSwatchInput"
@@ -46,7 +46,11 @@ export function CharacterSection({
         <ColorSwatchInput value={spotColor} onChange={onSpotColorChange} disabled={!spots} />
       </HStack>
 
-      <OpacitySlider label="Spot opacity" value={spotOpacity} onChange={onSpotOpacityChange} disabled={!spots} />
+      <Collapsible.Root open={spots}>
+        <Collapsible.Content>
+          <OpacitySlider label="Spot opacity" value={spotOpacity} onChange={onSpotOpacityChange} />
+        </Collapsible.Content>
+      </Collapsible.Root>
     </Section>
   )
 }
