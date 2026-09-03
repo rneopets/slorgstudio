@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import { Button, HStack, IconButton, Menu, NativeSelect, Portal } from "@chakra-ui/react"
+import { Button, HStack, IconButton, Menu, NativeSelect, Portal, Stack } from "@chakra-ui/react"
 import { LuCheck, LuChevronDown, LuClipboardCopy, LuFileCode, LuFileImage } from "react-icons/lu"
 import { DEFAULT_EXPORT_SIZE_PX, EXPORT_SIZE_OPTIONS, copySlorgPngToClipboard, exportSlorgPng } from "../../art/exportPng"
 import { exportSlorgSvg } from "../../art/exportSvg"
@@ -56,8 +56,8 @@ export function ExportButton({ image, transform, ...appearance }: ExportButtonPr
   }
 
   return (
-    <HStack gap="2" width="full">
-      <NativeSelect.Root size="sm" width="24" flexShrink="0" disabled={!canExport}>
+    <Stack direction={{ base: "column", sm: "row" }} align="stretch" gap="2" width="full">
+      <NativeSelect.Root size="sm" width={{ base: "full", sm: "24" }} flexShrink="0" disabled={!canExport}>
         <NativeSelect.Field value={sizePx} onChange={(e) => setSizePx(Number(e.target.value))}>
           {EXPORT_SIZE_OPTIONS.map((size) => (
             <option key={size} value={size}>
@@ -68,11 +68,17 @@ export function ExportButton({ image, transform, ...appearance }: ExportButtonPr
         <NativeSelect.Indicator />
       </NativeSelect.Root>
 
-      <Button onClick={handleCopy} disabled={!canExport} loading={isCopying} variant="outline" flex="1">
+      <Button
+        onClick={handleCopy}
+        disabled={!canExport}
+        loading={isCopying}
+        variant="outline"
+        flex={{ base: "none", sm: "1" }}
+      >
         {justCopied ? <LuCheck /> : <LuClipboardCopy />} {justCopied ? "Copied!" : "Copy PNG"}
       </Button>
 
-      <HStack gap="0" flex="1">
+      <HStack gap="0" flex={{ base: "none", sm: "1" }}>
         <Button
           onClick={handleExportPng}
           disabled={!canExport}
@@ -107,6 +113,6 @@ export function ExportButton({ image, transform, ...appearance }: ExportButtonPr
           </Portal>
         </Menu.Root>
       </HStack>
-    </HStack>
+    </Stack>
   )
 }
