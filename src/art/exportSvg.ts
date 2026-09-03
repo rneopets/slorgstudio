@@ -51,8 +51,17 @@ export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTr
     const cx = rect.x + rect.width / 2
     const cy = rect.y + rect.height / 2
     const href = imageToDataUrl(image)
-    const rotateAttr = transform.rotation ? ` transform="rotate(${transform.rotation} ${cx} ${cy})"` : ""
-    backgroundMarkup = `<image href="${href}" x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" preserveAspectRatio="none"${rotateAttr}/>`
+    const transformParts: string[] = []
+    if (transform.rotation || transform.flipHorizontal || transform.flipVertical) {
+      transformParts.push(`translate(${cx} ${cy})`)
+      if (transform.rotation) transformParts.push(`rotate(${transform.rotation})`)
+      if (transform.flipHorizontal || transform.flipVertical) {
+        transformParts.push(`scale(${transform.flipHorizontal ? -1 : 1} ${transform.flipVertical ? -1 : 1})`)
+      }
+      transformParts.push(`translate(${-cx} ${-cy})`)
+    }
+    const transformAttr = transformParts.length ? ` transform="${transformParts.join(" ")}"` : ""
+    backgroundMarkup = `<image href="${href}" x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" preserveAspectRatio="none"${transformAttr}/>`
   } else if (backgroundColor) {
     // Overfill past the body's true bounds and let the clip trim it to the silhouette, rather
     // than relying on BODY_BBOX being pixel-exact - guarantees no gap between the fill and the

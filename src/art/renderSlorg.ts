@@ -130,6 +130,7 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
     ctx.save()
     ctx.translate(cx, cy)
     ctx.rotate((imageTransform.rotation * Math.PI) / 180)
+    ctx.scale(imageTransform.flipHorizontal ? -1 : 1, imageTransform.flipVertical ? -1 : 1)
     ctx.translate(-cx, -cy)
     ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height)
     ctx.restore()

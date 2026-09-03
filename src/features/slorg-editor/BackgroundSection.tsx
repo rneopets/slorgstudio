@@ -3,6 +3,7 @@ import { Section } from "../../components/ui/Section"
 import { ImageDropzone } from "../../components/ui/ImageDropzone"
 import { ZoomSlider } from "../../components/ui/ZoomSlider"
 import { RotationSlider } from "../../components/ui/RotationSlider"
+import { FlipButtons } from "../../components/ui/FlipButtons"
 import { ColorSwatchInput } from "../../components/ui/ColorSwatchInput"
 import { DEFAULT_BODY_COLOR } from "../../art/slorgArt"
 import type { ImageTransform } from "../../art/coverFit"
@@ -47,6 +48,13 @@ export function BackgroundSection({
             <RotationSlider
               value={transform.rotation}
               onChange={(rotation) => onTransformChange({ ...transform, rotation })}
+              disabled={!hasImage}
+            />
+            <FlipButtons
+              flipHorizontal={transform.flipHorizontal}
+              flipVertical={transform.flipVertical}
+              onFlipHorizontalChange={(flipHorizontal) => onTransformChange({ ...transform, flipHorizontal })}
+              onFlipVerticalChange={(flipVertical) => onTransformChange({ ...transform, flipVertical })}
               disabled={!hasImage}
             />
           </Stack>
