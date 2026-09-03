@@ -1,12 +1,13 @@
 import { Slider } from "@chakra-ui/react"
 
 interface OpacitySliderProps {
+  label: string
   value: number
   onChange: (value: number) => void
   disabled?: boolean
 }
 
-export function OpacitySlider({ value, onChange, disabled }: OpacitySliderProps) {
+export function OpacitySlider({ label, value, onChange, disabled }: OpacitySliderProps) {
   return (
     <Slider.Root
       width="full"
@@ -17,7 +18,7 @@ export function OpacitySlider({ value, onChange, disabled }: OpacitySliderProps)
       disabled={disabled}
       onValueChange={(details) => onChange(details.value[0])}
     >
-      <Slider.Label>Spot opacity</Slider.Label>
+      <Slider.Label>{label}</Slider.Label>
       <Slider.Control>
         <Slider.Track>
           <Slider.Range />

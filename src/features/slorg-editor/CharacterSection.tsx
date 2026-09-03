@@ -46,7 +46,7 @@ export function CharacterSection({
         <ColorSwatchInput value={spotColor} onChange={onSpotColorChange} disabled={!spots} />
       </HStack>
 
-      <OpacitySlider value={spotOpacity} onChange={onSpotOpacityChange} disabled={!spots} />
+      <OpacitySlider label="Spot opacity" value={spotOpacity} onChange={onSpotOpacityChange} disabled={!spots} />
     </Section>
   )
 }
