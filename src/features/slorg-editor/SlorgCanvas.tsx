@@ -19,6 +19,8 @@ export function SlorgCanvas({
   transform,
   onTransformChange,
   backgroundColor,
+  colorOpacity,
+  colorLayer,
   madEyes,
   spots,
   spotColor,
@@ -41,12 +43,25 @@ export function SlorgCanvas({
       image,
       imageTransform: transform,
       backgroundColor,
+      colorOpacity,
+      colorLayer,
       madEyes,
       spots,
       spotColor,
       spotOpacity,
     })
-  }, [image, transform, backgroundColor, madEyes, spots, spotColor, spotOpacity, size])
+  }, [
+    image,
+    transform,
+    backgroundColor,
+    colorOpacity,
+    colorLayer,
+    madEyes,
+    spots,
+    spotColor,
+    spotOpacity,
+    size,
+  ])
 
   function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
     if (!image) return

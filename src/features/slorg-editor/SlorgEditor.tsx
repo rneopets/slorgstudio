@@ -12,6 +12,8 @@ export function SlorgEditor() {
   const [image, setImage] = useState<HTMLImageElement | null>(null)
   const [transform, setTransform] = useState<ImageTransform>(DEFAULT_TRANSFORM)
   const [backgroundColor, setBackgroundColor] = useState<string | null>(DEFAULT_BODY_COLOR)
+  const [colorOpacity, setColorOpacity] = useState(1)
+  const [colorLayer, setColorLayer] = useState<"front" | "back">("back")
   const [madEyes, setMadEyes] = useState(false)
   const [spots, setSpots] = useState(true)
   const [spotColor, setSpotColor] = useState(SPOT_COLOR)
@@ -20,12 +22,6 @@ export function SlorgEditor() {
   function handleImageReady(nextImage: HTMLImageElement) {
     setImage(nextImage)
     setTransform(DEFAULT_TRANSFORM)
-    setBackgroundColor(null)
-  }
-
-  function handleBackgroundColorChange(color: string) {
-    setBackgroundColor(color)
-    setImage(null)
   }
 
   return (
@@ -36,6 +32,8 @@ export function SlorgEditor() {
           transform={transform}
           onTransformChange={setTransform}
           backgroundColor={backgroundColor}
+          colorOpacity={colorOpacity}
+          colorLayer={colorLayer}
           madEyes={madEyes}
           spots={spots}
           spotColor={spotColor}
@@ -47,6 +45,8 @@ export function SlorgEditor() {
             image={image}
             transform={transform}
             backgroundColor={backgroundColor}
+            colorOpacity={colorOpacity}
+            colorLayer={colorLayer}
             madEyes={madEyes}
             spots={spots}
             spotColor={spotColor}
@@ -59,7 +59,11 @@ export function SlorgEditor() {
         <BackgroundSection
           onImageReady={handleImageReady}
           backgroundColor={backgroundColor}
-          onBackgroundColorChange={handleBackgroundColorChange}
+          onBackgroundColorChange={setBackgroundColor}
+          colorOpacity={colorOpacity}
+          onColorOpacityChange={setColorOpacity}
+          colorLayer={colorLayer}
+          onColorLayerChange={setColorLayer}
           transform={transform}
           onTransformChange={setTransform}
           hasImage={!!image}
