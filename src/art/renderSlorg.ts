@@ -132,6 +132,7 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
     ctx.rotate((imageTransform.rotation * Math.PI) / 180)
     ctx.scale(imageTransform.flipHorizontal ? -1 : 1, imageTransform.flipVertical ? -1 : 1)
     ctx.translate(-cx, -cy)
+    ctx.filter = imageTransform.blur > 0 ? `blur(${imageTransform.blur}px)` : "none"
     ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height)
     ctx.restore()
   } else if (backgroundColor) {

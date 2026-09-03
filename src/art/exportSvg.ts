@@ -61,7 +61,8 @@ export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTr
       transformParts.push(`translate(${-cx} ${-cy})`)
     }
     const transformAttr = transformParts.length ? ` transform="${transformParts.join(" ")}"` : ""
-    backgroundMarkup = `<image href="${href}" x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" preserveAspectRatio="none"${transformAttr}/>`
+    const filterAttr = transform.blur > 0 ? ` filter="url(#slorg-blur)"` : ""
+    backgroundMarkup = `<image href="${href}" x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" preserveAspectRatio="none"${transformAttr}${filterAttr}/>`
   } else if (backgroundColor) {
     // Overfill past the body's true bounds and let the clip trim it to the silhouette, rather
     // than relying on BODY_BBOX being pixel-exact - guarantees no gap between the fill and the
@@ -91,6 +92,13 @@ export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTr
   const madTearsMarkup = madEyes ? MAD_TEAR_PATHS.map((p) => pathTag(p)).join("") : ""
   const madEyebrowsMarkup = madEyes ? MAD_EYEBROW_PATHS.map((p) => pathTag(p)).join("") : ""
 
+  // Enlarged filter region so the blurred edges of the image aren't clipped by SVG's default
+  // 10%-margin filter box.
+  const blurFilterMarkup =
+    transform.blur > 0
+      ? `<filter id="slorg-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${transform.blur}"/></filter>`
+      : ""
+
   // clipPath content is defined in the user space of the element that references it
   // (the <g clip-path="..."> below), which already sits inside the translate(PADDING,PADDING)
   // group - so it only needs the path's own matrix, not a second translate.
@@ -100,6 +108,7 @@ export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTr
 <clipPath id="slorg-body-clip">
 <path d="${BODY_OUTLINE.d}" transform="matrix(${oa},${ob},${oc},${od},${oe},${of})"/>
 </clipPath>
+${blurFilterMarkup}
 </defs>
 <g transform="translate(${PADDING},${PADDING})">
 <g clip-path="url(#slorg-body-clip)">

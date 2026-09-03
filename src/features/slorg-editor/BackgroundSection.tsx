@@ -4,6 +4,7 @@ import { ImageDropzone } from "../../components/ui/ImageDropzone"
 import { ZoomSlider } from "../../components/ui/ZoomSlider"
 import { RotationSlider } from "../../components/ui/RotationSlider"
 import { FlipButtons } from "../../components/ui/FlipButtons"
+import { BlurSlider } from "../../components/ui/BlurSlider"
 import { ColorSwatchInput } from "../../components/ui/ColorSwatchInput"
 import { DEFAULT_BODY_COLOR } from "../../art/slorgArt"
 import type { ImageTransform } from "../../art/coverFit"
@@ -55,6 +56,11 @@ export function BackgroundSection({
               flipVertical={transform.flipVertical}
               onFlipHorizontalChange={(flipHorizontal) => onTransformChange({ ...transform, flipHorizontal })}
               onFlipVerticalChange={(flipVertical) => onTransformChange({ ...transform, flipVertical })}
+              disabled={!hasImage}
+            />
+            <BlurSlider
+              value={transform.blur}
+              onChange={(blur) => onTransformChange({ ...transform, blur })}
               disabled={!hasImage}
             />
           </Stack>

@@ -17,6 +17,8 @@ export interface ImageTransform {
   flipHorizontal: boolean
   /** Mirror the image top-bottom, applied around its own center before rotation. */
   flipVertical: boolean
+  /** Gaussian blur radius in viewBox units applied to the image only. Range 0..20, 0 = none. */
+  blur: number
 }
 
 export const DEFAULT_TRANSFORM: ImageTransform = {
@@ -26,6 +28,7 @@ export const DEFAULT_TRANSFORM: ImageTransform = {
   rotation: 0,
   flipHorizontal: false,
   flipVertical: false,
+  blur: 0,
 }
 
 /** The "background-size: cover" base scale that makes an image of naturalW x naturalH fully cover bbox. */
