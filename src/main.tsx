@@ -4,6 +4,9 @@ import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import { ColorModeProvider } from "./components/ui/color-mode.tsx"
 import "./index.css"
 import { App } from "./App.tsx"
+import { registerServiceWorker } from "./pwa"
+
+registerServiceWorker()
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
