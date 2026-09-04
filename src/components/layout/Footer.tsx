@@ -21,6 +21,8 @@ function Logo() {
 function Copyright(props: TextProps) {
   return (
     <Text fontSize="sm" color="fg.muted" {...props}>
+      Slorg design by Novey.
+      <br />
       Website, design, and code &copy; Slorg Studio
       <br />
       This is an unofficial Neopets fansite with no affiliation/endorsement with Neopets.
