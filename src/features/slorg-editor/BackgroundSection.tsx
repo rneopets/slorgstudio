@@ -53,7 +53,11 @@ export function BackgroundSection({
           </Collapsible.Content>
         </Collapsible.Root>
         <OpacitySlider label="Color opacity" value={colorOpacity} onChange={onColorOpacityChange} />
-        <ColorLayerToggle value={colorLayer} onChange={onColorLayerChange} disabled={!hasImage} />
+        <Collapsible.Root open={hasImage}>
+          <Collapsible.Content>
+            <ColorLayerToggle value={colorLayer} onChange={onColorLayerChange} />
+          </Collapsible.Content>
+        </Collapsible.Root>
 
         <Separator />
 
