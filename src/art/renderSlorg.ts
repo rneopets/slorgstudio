@@ -76,32 +76,123 @@ function drawSpotsOverlay(
   ctx.restore()
 }
 
-// Tunable: larger = less aggressive downsampling for a given blur radius.
-const BLUR_SOFTNESS = 8
+function premultiplyAlpha(data: Uint8ClampedArray) {
+  for (let i = 0; i < data.length; i += 4) {
+    const a = data[i + 3] / 255
+    data[i] *= a
+    data[i + 1] *= a
+    data[i + 2] *= a
+  }
+}
+
+function unpremultiplyAlpha(data: Uint8ClampedArray) {
+  for (let i = 0; i < data.length; i += 4) {
+    const a = data[i + 3]
+    if (a === 0) continue
+    const factor = 255 / a
+    data[i] *= factor
+    data[i + 1] *= factor
+    data[i + 2] *= factor
+  }
+}
+
+// One box-blur sweep along rows (horizontal) or columns (vertical), via a sliding
+// window sum so cost stays O(width * height) regardless of radius. Edge pixels are
+// clamped (extended) rather than wrapped.
+function boxBlurPass(
+  src: Uint8ClampedArray,
+  dst: Uint8ClampedArray,
+  width: number,
+  height: number,
+  radius: number,
+  horizontal: boolean,
+) {
+  const windowSize = radius * 2 + 1
+  const lineLength = horizontal ? width : height
+  const lineCount = horizontal ? height : width
+
+  for (let line = 0; line < lineCount; line++) {
+    let sumR = 0
+    let sumG = 0
+    let sumB = 0
+    let sumA = 0
+    for (let i = -radius; i <= radius; i++) {
+      const pos = Math.min(lineLength - 1, Math.max(0, i))
+      const idx = horizontal ? (line * width + pos) * 4 : (pos * width + line) * 4
+      sumR += src[idx]
+      sumG += src[idx + 1]
+      sumB += src[idx + 2]
+      sumA += src[idx + 3]
+    }
+    for (let pos = 0; pos < lineLength; pos++) {
+      const outIdx = horizontal ? (line * width + pos) * 4 : (pos * width + line) * 4
+      dst[outIdx] = sumR / windowSize
+      dst[outIdx + 1] = sumG / windowSize
+      dst[outIdx + 2] = sumB / windowSize
+      dst[outIdx + 3] = sumA / windowSize
+
+      const addPos = Math.min(lineLength - 1, pos + radius + 1)
+      const subPos = Math.max(0, pos - radius)
+      const addIdx = horizontal ? (line * width + addPos) * 4 : (addPos * width + line) * 4
+      const subIdx = horizontal ? (line * width + subPos) * 4 : (subPos * width + line) * 4
+      sumR += src[addIdx] - src[subIdx]
+      sumG += src[addIdx + 1] - src[subIdx + 1]
+      sumB += src[addIdx + 2] - src[subIdx + 2]
+      sumA += src[addIdx + 3] - src[subIdx + 3]
+    }
+  }
+}
+
+// Three box-blur passes (horizontal + vertical each) closely approximate a true
+// Gaussian blur of the same radius - the standard cheap alternative to a real
+// Gaussian convolution.
+function boxBlurImageData(imageData: ImageData, radius: number) {
+  const { width, height, data } = imageData
+  let src = data
+  let dst = new Uint8ClampedArray(data.length)
+  for (let pass = 0; pass < 3; pass++) {
+    boxBlurPass(src, dst, width, height, radius, true)
+    ;[src, dst] = [dst, src]
+    boxBlurPass(src, dst, width, height, radius, false)
+    ;[src, dst] = [dst, src]
+  }
+}
+
+// Working resolution is capped so blur cost stays bounded regardless of the export
+// size (up to 8192px) - the blur radius is scaled down to match, and detail lost by
+// blurring at a lower resolution is imperceptible once the result is soft anyway.
+const MAX_BLUR_DIMENSION = 512
 
 // ctx.filter = "blur(...)" is silently ignored on iOS Safari (and unreliable on other
-// WebKit builds), so blur is faked by downsampling the image (averaging pixels
-// together) then drawing it back up at full size with high-quality magnification -
-// using only drawImage, which is reliable everywhere.
+// WebKit builds), so blur is computed manually via a triple box-blur on pixel data -
+// this only relies on drawImage/getImageData/putImageData, which are reliable
+// everywhere.
 function blurredImageSource(
   image: CanvasImageSource,
   pixelWidth: number,
   pixelHeight: number,
   blurPx: number,
 ): HTMLCanvasElement {
-  const downscale = 1 / (1 + blurPx / BLUR_SOFTNESS)
-  const smallWidth = Math.max(1, Math.round(pixelWidth * downscale))
-  const smallHeight = Math.max(1, Math.round(pixelHeight * downscale))
+  const workScale = Math.min(1, MAX_BLUR_DIMENSION / Math.max(pixelWidth, pixelHeight))
+  const workWidth = Math.max(1, Math.round(pixelWidth * workScale))
+  const workHeight = Math.max(1, Math.round(pixelHeight * workScale))
+  const radius = Math.max(1, Math.round(blurPx * workScale))
 
-  const small = document.createElement("canvas")
-  small.width = smallWidth
-  small.height = smallHeight
-  const smallCtx = small.getContext("2d")
-  if (!smallCtx) throw new Error("Canvas 2D context unavailable")
-  smallCtx.imageSmoothingEnabled = true
-  smallCtx.imageSmoothingQuality = "high"
-  smallCtx.drawImage(image, 0, 0, smallWidth, smallHeight)
-  return small
+  const canvas = document.createElement("canvas")
+  canvas.width = workWidth
+  canvas.height = workHeight
+  const offCtx = canvas.getContext("2d")
+  if (!offCtx) throw new Error("Canvas 2D context unavailable")
+  offCtx.imageSmoothingEnabled = true
+  offCtx.imageSmoothingQuality = "high"
+  offCtx.drawImage(image, 0, 0, workWidth, workHeight)
+
+  const imageData = offCtx.getImageData(0, 0, workWidth, workHeight)
+  premultiplyAlpha(imageData.data)
+  boxBlurImageData(imageData, radius)
+  unpremultiplyAlpha(imageData.data)
+  offCtx.putImageData(imageData, 0, 0)
+  return canvas
 }
 
 let checkerPattern: CanvasPattern | null = null
