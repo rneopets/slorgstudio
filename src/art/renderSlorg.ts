@@ -18,6 +18,7 @@ import {
   type SlorgAppearance,
   type SlorgPath,
 } from "./slorgArt"
+import { canvasRGBA } from "stackblur-canvas"
 import { computeCoverRect, DEFAULT_TRANSFORM, type ImageTransform } from "./coverFit"
 import { computeGradientLine, gradientStopOffsets } from "./gradient"
 
@@ -74,6 +75,40 @@ function drawSpotsOverlay(
   ctx.globalAlpha = opacity
   ctx.drawImage(mask, 0, 0)
   ctx.restore()
+}
+
+// Working resolution is capped so blur cost stays bounded regardless of the export
+// size (up to 8192px) - the blur radius is scaled down to match, and detail lost by
+// blurring at a lower resolution is imperceptible once the result is soft anyway.
+const MAX_BLUR_DIMENSION = 512
+// stackblur-canvas's precomputed tables only cover radii up to 254.
+const MAX_BLUR_RADIUS = 254
+
+// ctx.filter = "blur(...)" is silently ignored on iOS Safari (and unreliable on other
+// WebKit builds), so blur is computed manually with stackblur-canvas (a fast,
+// near-Gaussian blur that operates directly on canvas pixel data) instead.
+function blurredImageSource(
+  image: CanvasImageSource,
+  pixelWidth: number,
+  pixelHeight: number,
+  blurPx: number,
+): HTMLCanvasElement {
+  const workScale = Math.min(1, MAX_BLUR_DIMENSION / Math.max(pixelWidth, pixelHeight))
+  const workWidth = Math.max(1, Math.round(pixelWidth * workScale))
+  const workHeight = Math.max(1, Math.round(pixelHeight * workScale))
+  const radius = Math.min(MAX_BLUR_RADIUS, Math.max(1, Math.round(blurPx * workScale)))
+
+  const canvas = document.createElement("canvas")
+  canvas.width = workWidth
+  canvas.height = workHeight
+  const offCtx = canvas.getContext("2d")
+  if (!offCtx) throw new Error("Canvas 2D context unavailable")
+  offCtx.imageSmoothingEnabled = true
+  offCtx.imageSmoothingQuality = "high"
+  offCtx.drawImage(image, 0, 0, workWidth, workHeight)
+
+  canvasRGBA(canvas, 0, 0, workWidth, workHeight, radius)
+  return canvas
 }
 
 let checkerPattern: CanvasPattern | null = null
@@ -138,9 +173,19 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
     ctx.rotate((imageTransform.rotation * Math.PI) / 180)
     ctx.scale(imageTransform.flipHorizontal ? -1 : 1, imageTransform.flipVertical ? -1 : 1)
     ctx.translate(-cx, -cy)
-    ctx.filter = imageTransform.blur > 0 ? `blur(${imageTransform.blur * viewboxToCanvasScale}px)` : "none"
     ctx.globalAlpha = imageTransform.opacity
-    ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height)
+    let source: CanvasImageSource = image
+    if (imageTransform.blur > 0) {
+      source = blurredImageSource(
+        image,
+        rect.width * viewboxToCanvasScale,
+        rect.height * viewboxToCanvasScale,
+        imageTransform.blur * viewboxToCanvasScale,
+      )
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = "high"
+    }
+    ctx.drawImage(source, rect.x, rect.y, rect.width, rect.height)
     ctx.restore()
   }
 

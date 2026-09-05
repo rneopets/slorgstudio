@@ -11,6 +11,7 @@
         "react": "^19.2.8",
         "react-dom": "^19.2.8",
         "react-icons": "^5.7.0",
+        "stackblur-canvas": "^3.0.1",
       },
       "devDependencies": {
         "@types/node": "^24.13.3",
@@ -449,6 +450,8 @@
     "source-map": ["source-map@0.5.7", "", {}, "sha512-LbrmJOMUSdEVxIKvdcJzQC+nQhe8FUZQTXQy6+I75skNgn3OoQ0DZA8YnFa7gp8tqtL3KPf1kmo0R5DoApeSGQ=="],
 
     "source-map-js": ["source-map-js@1.2.1", "", {}, "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA=="],
+
+    "stackblur-canvas": ["stackblur-canvas@3.0.1", "", {}, "sha512-eJpxkL5PR39dioN3ZapIIhkjQd01wxcigCnBURzbRofZk5M+cHZUA8VwBelHLhsFW20gO9vdH6hFRIekA+jJfA=="],
 
     "stylis": ["stylis@4.2.0", "", {}, "sha512-Orov6g6BB1sDfYgzWfTHDOxamtX1bE/zo104Dh9e6fqJ3PooipYyfJ0pUmrZO2wAvO8YbEyeFrkV91XTsGMSrw=="],
 
