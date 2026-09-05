@@ -76,6 +76,34 @@ function drawSpotsOverlay(
   ctx.restore()
 }
 
+// Tunable: larger = less aggressive downsampling for a given blur radius.
+const BLUR_SOFTNESS = 8
+
+// ctx.filter = "blur(...)" is silently ignored on iOS Safari (and unreliable on other
+// WebKit builds), so blur is faked by downsampling the image (averaging pixels
+// together) then drawing it back up at full size with high-quality magnification -
+// using only drawImage, which is reliable everywhere.
+function blurredImageSource(
+  image: CanvasImageSource,
+  pixelWidth: number,
+  pixelHeight: number,
+  blurPx: number,
+): HTMLCanvasElement {
+  const downscale = 1 / (1 + blurPx / BLUR_SOFTNESS)
+  const smallWidth = Math.max(1, Math.round(pixelWidth * downscale))
+  const smallHeight = Math.max(1, Math.round(pixelHeight * downscale))
+
+  const small = document.createElement("canvas")
+  small.width = smallWidth
+  small.height = smallHeight
+  const smallCtx = small.getContext("2d")
+  if (!smallCtx) throw new Error("Canvas 2D context unavailable")
+  smallCtx.imageSmoothingEnabled = true
+  smallCtx.imageSmoothingQuality = "high"
+  smallCtx.drawImage(image, 0, 0, smallWidth, smallHeight)
+  return small
+}
+
 let checkerPattern: CanvasPattern | null = null
 function getCheckerPattern(ctx: CanvasRenderingContext2D): CanvasPattern {
   if (checkerPattern) return checkerPattern
@@ -138,9 +166,15 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
     ctx.rotate((imageTransform.rotation * Math.PI) / 180)
     ctx.scale(imageTransform.flipHorizontal ? -1 : 1, imageTransform.flipVertical ? -1 : 1)
     ctx.translate(-cx, -cy)
-    ctx.filter = imageTransform.blur > 0 ? `blur(${imageTransform.blur * viewboxToCanvasScale}px)` : "none"
     ctx.globalAlpha = imageTransform.opacity
-    ctx.drawImage(image, rect.x, rect.y, rect.width, rect.height)
+    const blurPx = imageTransform.blur * viewboxToCanvasScale
+    let source: CanvasImageSource = image
+    if (blurPx > 0) {
+      source = blurredImageSource(image, rect.width * viewboxToCanvasScale, rect.height * viewboxToCanvasScale, blurPx)
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = "high"
+    }
+    ctx.drawImage(source, rect.x, rect.y, rect.width, rect.height)
     ctx.restore()
   }
 
