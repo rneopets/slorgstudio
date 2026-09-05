@@ -15,7 +15,7 @@ export function SlorgEditor() {
   const [colorGradientAngle, setColorGradientAngle] = useState(DEFAULT_GRADIENT_ANGLE)
   const [colorOpacity, setColorOpacity] = useState(1)
   const [colorLayer, setColorLayer] = useState<"front" | "back">("back")
-  const [madEyes, setMadEyes] = useState(false)
+  const [madEyes, setMadEyes] = useState(() => Math.random() < 0.02)
   const [spots, setSpots] = useState(true)
   const [spotColor, setSpotColor] = useState(SPOT_COLOR)
   const [spotOpacity, setSpotOpacity] = useState(SPOT_OPACITY)
