@@ -16,7 +16,7 @@ interface FooterLogoProps {
 export function FooterLogo({ size = 64 }: FooterLogoProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [spins, setSpins] = useState(0)
-  const [madEyes, setMadEyes] = useState(false)
+  const [madEyes, setMadEyes] = useState(() => Math.random() < 0.02)
   const lastClickRef = useRef(0)
   const streakRef = useRef(0)
 
