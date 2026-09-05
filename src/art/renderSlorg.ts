@@ -174,10 +174,14 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
     ctx.scale(imageTransform.flipHorizontal ? -1 : 1, imageTransform.flipVertical ? -1 : 1)
     ctx.translate(-cx, -cy)
     ctx.globalAlpha = imageTransform.opacity
-    const blurPx = imageTransform.blur * viewboxToCanvasScale
     let source: CanvasImageSource = image
-    if (blurPx > 0) {
-      source = blurredImageSource(image, rect.width * viewboxToCanvasScale, rect.height * viewboxToCanvasScale, blurPx)
+    if (imageTransform.blur > 0) {
+      source = blurredImageSource(
+        image,
+        rect.width * viewboxToCanvasScale,
+        rect.height * viewboxToCanvasScale,
+        imageTransform.blur * viewboxToCanvasScale,
+      )
       ctx.imageSmoothingEnabled = true
       ctx.imageSmoothingQuality = "high"
     }
