@@ -6,7 +6,14 @@ import { CharacterSection } from "./CharacterSection"
 import { Section } from "../../components/ui/Section"
 import { ExportButton } from "./ExportButton"
 import { DEFAULT_TRANSFORM, type ImageTransform } from "../../art/coverFit"
-import { DEFAULT_BODY_COLOR, DEFAULT_GRADIENT_ANGLE, SPOT_COLOR, SPOT_OPACITY } from "../../art/slorgArt"
+import {
+  DEFAULT_BODY_COLOR,
+  DEFAULT_GRADIENT_ANGLE,
+  DEFAULT_IRIS_COLOR,
+  DEFAULT_SCLERA_COLOR,
+  SPOT_COLOR,
+  SPOT_OPACITY,
+} from "../../art/slorgArt"
 
 export function SlorgEditor() {
   const [image, setImage] = useState<HTMLImageElement | null>(null)
@@ -19,6 +26,8 @@ export function SlorgEditor() {
   const [spots, setSpots] = useState(true)
   const [spotColor, setSpotColor] = useState(SPOT_COLOR)
   const [spotOpacity, setSpotOpacity] = useState(SPOT_OPACITY)
+  const [irisColor, setIrisColor] = useState(DEFAULT_IRIS_COLOR)
+  const [scleraColor, setScleraColor] = useState(DEFAULT_SCLERA_COLOR)
 
   function handleImageReady(nextImage: HTMLImageElement) {
     setImage(nextImage)
@@ -40,6 +49,8 @@ export function SlorgEditor() {
           spots={spots}
           spotColor={spotColor}
           spotOpacity={spotOpacity}
+          irisColor={irisColor}
+          scleraColor={scleraColor}
         />
 
         <Section title="Export">
@@ -54,6 +65,8 @@ export function SlorgEditor() {
             spots={spots}
             spotColor={spotColor}
             spotOpacity={spotOpacity}
+            irisColor={irisColor}
+            scleraColor={scleraColor}
           />
         </Section>
       </Stack>
@@ -83,6 +96,10 @@ export function SlorgEditor() {
           onSpotColorChange={setSpotColor}
           spotOpacity={spotOpacity}
           onSpotOpacityChange={setSpotOpacity}
+          irisColor={irisColor}
+          onIrisColorChange={setIrisColor}
+          scleraColor={scleraColor}
+          onScleraColorChange={setScleraColor}
         />
       </Stack>
     </Flex>

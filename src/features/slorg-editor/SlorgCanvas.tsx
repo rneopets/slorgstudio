@@ -26,6 +26,8 @@ export function SlorgCanvas({
   spots,
   spotColor,
   spotOpacity,
+  irisColor,
+  scleraColor,
   size = 400,
 }: SlorgCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -51,6 +53,8 @@ export function SlorgCanvas({
       spots,
       spotColor,
       spotOpacity,
+      irisColor,
+      scleraColor,
     })
   }, [
     image,
@@ -63,6 +67,8 @@ export function SlorgCanvas({
     spots,
     spotColor,
     spotOpacity,
+    irisColor,
+    scleraColor,
     size,
   ])
 
