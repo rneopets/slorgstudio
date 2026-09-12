@@ -19,6 +19,8 @@ export interface SlorgAppearance {
   spots: boolean
   spotColor: string
   spotOpacity: number
+  irisColor: string
+  scleraColor: string
 }
 
 const VIEWBOX = { width: 170.66667, height: 170.66667 }
@@ -120,11 +122,20 @@ export const EYE_PATHS: SlorgPath[] = [
 /** IDs of the pupil paths within EYE_PATHS, so the renderer can swap their fill in Mad Eyes mode. */
 export const PUPIL_PATH_IDS = new Set(["path25", "path27"])
 
+/** IDs of the sclera ("eye white") paths within EYE_PATHS, so the renderer can swap their fill. */
+export const SCLERA_PATH_IDS = new Set(["path23", "path24"])
+
 /** IDs of the pupil highlight-dot paths within EYE_PATHS, hidden in Mad Eyes mode. */
 export const HIGHLIGHT_PATH_IDS = new Set(["path26", "path28"])
 
 /** Iris color used for the pupils when Mad Slorg Eyes is enabled. */
 export const MAD_PUPIL_FILL = "#4a2f00"
+
+/** Default iris (pupil) color for normal (non-Mad-Eyes) rendering. */
+export const DEFAULT_IRIS_COLOR = "#000000"
+
+/** Default sclera (eye white) color. */
+export const DEFAULT_SCLERA_COLOR = "#ffffff"
 
 /**
  * Pupil transforms used only in Mad Slorg Eyes mode: same shape/size as the normal pupils

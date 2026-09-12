@@ -1,4 +1,4 @@
-import { Collapsible, HStack, Switch } from "@chakra-ui/react"
+import { Collapsible, HStack, Switch, Text } from "@chakra-ui/react"
 import { Section } from "../../components/ui/Section"
 import { OpacitySlider } from "../../components/ui/OpacitySlider"
 import { ColorSwatchInput } from "../../components/ui/ColorSwatchInput"
@@ -12,6 +12,10 @@ interface CharacterSectionProps {
   onSpotColorChange: (color: string) => void
   spotOpacity: number
   onSpotOpacityChange: (value: number) => void
+  irisColor: string
+  onIrisColorChange: (color: string) => void
+  scleraColor: string
+  onScleraColorChange: (color: string) => void
 }
 
 export function CharacterSection({
@@ -23,6 +27,10 @@ export function CharacterSection({
   onSpotColorChange,
   spotOpacity,
   onSpotOpacityChange,
+  irisColor,
+  onIrisColorChange,
+  scleraColor,
+  onScleraColorChange,
 }: CharacterSectionProps) {
   return (
     <Section title="Character">
@@ -51,6 +59,20 @@ export function CharacterSection({
           <OpacitySlider label="Spot opacity" value={spotOpacity} onChange={onSpotOpacityChange} />
         </Collapsible.Content>
       </Collapsible.Root>
+
+      <HStack justify="space-between">
+        <Text fontSize="xs" color="fg.muted">
+          Iris
+        </Text>
+        <ColorSwatchInput value={irisColor} onChange={onIrisColorChange} />
+      </HStack>
+
+      <HStack justify="space-between">
+        <Text fontSize="xs" color="fg.muted">
+          Eye white
+        </Text>
+        <ColorSwatchInput value={scleraColor} onChange={onScleraColorChange} />
+      </HStack>
     </Section>
   )
 }

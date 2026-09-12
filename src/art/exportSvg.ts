@@ -11,6 +11,7 @@ import {
   PADDED_VIEWBOX,
   PADDING,
   PUPIL_PATH_IDS,
+  SCLERA_PATH_IDS,
   SPOT_PATHS,
   type SlorgAppearance,
   type SlorgPath,
@@ -41,7 +42,8 @@ function imageToDataUrl(image: HTMLImageElement): string {
 }
 
 export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTransform, options: SlorgAppearance): string {
-  const { backgroundColors, colorGradientAngle, colorOpacity, colorLayer, madEyes, spots, spotColor, spotOpacity } = options
+  const { backgroundColors, colorGradientAngle, colorOpacity, colorLayer, madEyes, spots, spotColor, spotOpacity, irisColor, scleraColor } =
+    options
   const [oa, ob, oc, od, oe, of] = BODY_OUTLINE.transform
   const outlineStroke = BODY_OUTLINE.stroke ?? "#000000"
   const outlineWidth = BODY_OUTLINE.strokeWidth ?? 1
@@ -95,10 +97,13 @@ export function buildSlorgSvg(image: HTMLImageElement | null, transform: ImageTr
 
   const eyesMarkup = EYE_PATHS.filter((p) => !(madEyes && HIGHLIGHT_PATH_IDS.has(p.id)))
     .map((p) => {
-      const isPupil = madEyes && PUPIL_PATH_IDS.has(p.id)
-      const spec = isPupil && p.id in MAD_PUPIL_TRANSFORMS ? { ...p, transform: MAD_PUPIL_TRANSFORMS[p.id] } : p
+      const isPupil = PUPIL_PATH_IDS.has(p.id)
+      const isSclera = SCLERA_PATH_IDS.has(p.id)
+      const useMadTransform = madEyes && isPupil && p.id in MAD_PUPIL_TRANSFORMS
+      const spec = useMadTransform ? { ...p, transform: MAD_PUPIL_TRANSFORMS[p.id] } : p
+      const fill = madEyes && isPupil ? MAD_PUPIL_FILL : isPupil ? irisColor : isSclera ? scleraColor : undefined
       // Mad Eyes has no outline on the sclera or pupils, unlike the normal eyes.
-      return pathTag(spec, madEyes ? { fill: isPupil ? MAD_PUPIL_FILL : undefined, suppressStroke: true } : undefined)
+      return pathTag(spec, { fill, suppressStroke: madEyes })
     })
     .join("")
 

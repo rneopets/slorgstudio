@@ -2,6 +2,8 @@ import {
   BODY_BBOX,
   BODY_OUTLINE,
   DEFAULT_GRADIENT_ANGLE,
+  DEFAULT_IRIS_COLOR,
+  DEFAULT_SCLERA_COLOR,
   EYE_PATHS,
   HIGHLIGHT_PATH_IDS,
   MAD_EYEBROW_PATHS,
@@ -12,6 +14,7 @@ import {
   PADDED_VIEWBOX,
   PADDING,
   PUPIL_PATH_IDS,
+  SCLERA_PATH_IDS,
   SPOT_COLOR,
   SPOT_OPACITY,
   SPOT_PATHS,
@@ -152,6 +155,8 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
     spots = true,
     spotColor = SPOT_COLOR,
     spotOpacity = SPOT_OPACITY,
+    irisColor = DEFAULT_IRIS_COLOR,
+    scleraColor = DEFAULT_SCLERA_COLOR,
   } = options
 
   const viewboxToCanvasScale = canvasWidth / PADDED_VIEWBOX.width
@@ -231,10 +236,13 @@ export function renderSlorg(ctx: CanvasRenderingContext2D, options: RenderOption
   if (madEyes) for (const path of MAD_TEAR_PATHS) drawSlorgPath(ctx, path)
   for (const path of EYE_PATHS) {
     if (madEyes && HIGHLIGHT_PATH_IDS.has(path.id)) continue
-    const isPupil = madEyes && PUPIL_PATH_IDS.has(path.id)
-    const spec = isPupil && path.id in MAD_PUPIL_TRANSFORMS ? { ...path, transform: MAD_PUPIL_TRANSFORMS[path.id] } : path
+    const isPupil = PUPIL_PATH_IDS.has(path.id)
+    const isSclera = SCLERA_PATH_IDS.has(path.id)
+    const useMadTransform = madEyes && isPupil && path.id in MAD_PUPIL_TRANSFORMS
+    const spec = useMadTransform ? { ...path, transform: MAD_PUPIL_TRANSFORMS[path.id] } : path
+    const fill = madEyes && isPupil ? MAD_PUPIL_FILL : isPupil ? irisColor : isSclera ? scleraColor : undefined
     // Mad Eyes has no outline on the sclera or pupils, unlike the normal eyes.
-    drawSlorgPath(ctx, spec, madEyes ? { fill: isPupil ? MAD_PUPIL_FILL : undefined, suppressStroke: true } : undefined)
+    drawSlorgPath(ctx, spec, { fill, suppressStroke: madEyes })
   }
   // Eyebrows sit in front of the eye white, so they're drawn last.
   if (madEyes) for (const path of MAD_EYEBROW_PATHS) drawSlorgPath(ctx, path)
