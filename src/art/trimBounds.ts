@@ -45,6 +45,16 @@ export function computeTrimFraction(ctx: CanvasRenderingContext2D, size: number)
   }
 }
 
+/** Expands a trim rectangle to a square (same center, side = the longer dimension), clamped to the unit canvas. */
+export function squareTrimFraction(trim: TrimFraction): TrimFraction {
+  const side = Math.min(1, Math.max(trim.width, trim.height))
+  const cx = trim.x + trim.width / 2
+  const cy = trim.y + trim.height / 2
+  const x = Math.min(Math.max(cx - side / 2, 0), 1 - side)
+  const y = Math.min(Math.max(cy - side / 2, 0), 1 - side)
+  return { x, y, width: side, height: side }
+}
+
 /** Renders via the given callback onto a fixed-resolution detection canvas and returns the trim fraction. */
 export function detectTrimFraction(render: (ctx: CanvasRenderingContext2D, size: number) => void): TrimFraction {
   const canvas = document.createElement("canvas")

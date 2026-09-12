@@ -17,7 +17,7 @@ import {
 } from "./slorgArt"
 import { computeCoverRect, type ImageTransform } from "./coverFit"
 import { computeGradientLine, gradientStopOffsets } from "./gradient"
-import { computeTrimFraction } from "./trimBounds"
+import { computeTrimFraction, squareTrimFraction } from "./trimBounds"
 import { downloadBlob } from "../lib/downloadBlob"
 
 function pathTag(spec: SlorgPath, overrides?: { fill?: string; suppressStroke?: boolean }): string {
@@ -178,7 +178,7 @@ export async function exportSlorgSvg(
 
   // Detect the tight bounding box of non-transparent pixels (varies with Mad Eyes) and crop the
   // SVG's viewBox/width/height to it, rather than shipping the full padded canvas every time.
-  const trim = await detectSvgTrimFraction(svg)
+  const trim = squareTrimFraction(await detectSvgTrimFraction(svg))
   const trimmedSvg = withViewBox(svg, {
     x: trim.x * PADDED_VIEWBOX.width,
     y: trim.y * PADDED_VIEWBOX.height,

@@ -1,5 +1,5 @@
 import { renderSlorg, type RenderOptions } from "./renderSlorg"
-import { detectTrimFraction } from "./trimBounds"
+import { detectTrimFraction, squareTrimFraction } from "./trimBounds"
 import type { ImageTransform } from "./coverFit"
 import type { SlorgAppearance } from "./slorgArt"
 import { downloadBlob } from "../lib/downloadBlob"
@@ -36,7 +36,7 @@ export async function renderSlorgPngBlob(
   // pixels (varies with Mad Eyes, since the tears extend past the plain body silhouette), then
   // render again at whatever working resolution makes that trimmed region's longer side equal
   // sizePx, and crop to it - so the export has no wasted transparent margin at any toggle state.
-  const trim = detectTrimFraction((ctx, size) => renderSlorg(ctx, renderOptionsFor(size)))
+  const trim = squareTrimFraction(detectTrimFraction((ctx, size) => renderSlorg(ctx, renderOptionsFor(size))))
 
   const workingSize = Math.min(MAX_WORKING_SIZE_PX, Math.round(options.sizePx / Math.max(trim.width, trim.height)))
   const working = document.createElement("canvas")
